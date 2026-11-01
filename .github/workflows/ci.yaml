@@ -3,6 +3,7 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -10,12 +11,12 @@ permissions:
 jobs:
   python-checks:
     name: Python checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install development dependencies
@@ -29,19 +30,26 @@ jobs:
 
   hassfest:
     name: Validate with hassfest
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+      - name: Prepare custom integration layout
+        run: |
+          mkdir -p custom_components/crestron_xsig
+          cp ./*.py manifest.json strings.json services.yaml custom_components/crestron_xsig/
+          cp -a brand translations custom_components/crestron_xsig/
+          rm manifest.json
       - name: Run hassfest
         uses: home-assistant/actions/hassfest@master
 
   hacs:
     name: Validate with HACS
-    runs-on: ubuntu-latest
+    if: github.event.repository.private != true
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Validate HACS integration
         uses: hacs/action@main
         with:

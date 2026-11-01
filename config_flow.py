@@ -159,6 +159,20 @@ _HELP_DOCS = {
     OPT_ACTIONS: "action",
 }
 _HELP_BASE_URL = "https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help"
+_ADD_STEP_OPTION_KEYS = {
+    "add_switch": OPT_SWITCHES,
+    "add_light": OPT_LIGHTS,
+    "add_cover": OPT_COVERS,
+    "add_sensor": OPT_SENSORS,
+    "add_binary_sensor": OPT_BINARY_SENSORS,
+    "add_climate": OPT_CLIMATES,
+    "add_media_player": OPT_MEDIA_PLAYERS,
+    "add_text": OPT_TEXTS,
+    "add_number": OPT_NUMBERS,
+    "add_button": OPT_BUTTONS,
+    "add_expose": OPT_EXPOSES,
+    "add_action": OPT_ACTIONS,
+}
 
 
 def _help_url(option_key: str) -> str:
@@ -1067,11 +1081,30 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
     ) -> config_entries.FlowResult:
         """Re-show a form with the submitted values and a translatable error
         (error key resolved from options.error in strings.json)."""
-        return self.async_show_form(
-            step_id=step_id,
+        return self._show_add_form(
+            step_id,
+            _edit_schema(key, user_input, self._dev_field(user_input)),
             errors={"base": error},
-            data_schema=_edit_schema(key, user_input, self._dev_field(user_input)),
         )
+
+    def _show_add_form(
+        self,
+        step_id: str,
+        data_schema: vol.Schema,
+        *,
+        errors: dict[str, str] | None = None,
+    ) -> config_entries.FlowResult:
+        """Show an Add form with its type-specific external help URL."""
+        kwargs = {
+            "step_id": step_id,
+            "data_schema": data_schema,
+            "description_placeholders": {
+                "help_url": _help_url(_ADD_STEP_OPTION_KEYS[step_id])
+            },
+        }
+        if errors is not None:
+            kwargs["errors"] = errors
+        return self.async_show_form(**kwargs)
 
     def _dev_field(self, item: dict | None = None) -> dict:
         """Shared device and category fields for entity add/edit forms."""
@@ -1131,7 +1164,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(CONF_STATE_SYNC, default=False): cv.boolean,
             }
         )
-        return self.async_show_form(step_id="add_switch", data_schema=schema)
+        return self._show_add_form("add_switch", schema)
 
     # ------------------------------------------------------------------
     # Add: Expose (HA -> Crestron bridge rule, legacy "to_joins")
@@ -1140,14 +1173,14 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             error = _validate_expose(user_input)
             if error:
-                return self.async_show_form(
-                    step_id="add_expose",
+                return self._show_add_form(
+                    "add_expose",
+                    vol.Schema(_expose_fields(user_input)),
                     errors={"base": error},
-                    data_schema=vol.Schema(_expose_fields(user_input)),
                 )
             return self._save(OPT_EXPOSES, user_input)
-        return self.async_show_form(
-            step_id="add_expose", data_schema=vol.Schema(_expose_fields())
+        return self._show_add_form(
+            "add_expose", vol.Schema(_expose_fields())
         )
 
     # ------------------------------------------------------------------
@@ -1157,14 +1190,14 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             error = join_error_key(user_input.get("join", ""))
             if error:
-                return self.async_show_form(
-                    step_id="add_action",
+                return self._show_add_form(
+                    "add_action",
+                    vol.Schema(_action_fields(user_input)),
                     errors={"base": error},
-                    data_schema=vol.Schema(_action_fields(user_input)),
                 )
             return self._save(OPT_ACTIONS, user_input)
-        return self.async_show_form(
-            step_id="add_action", data_schema=vol.Schema(_action_fields())
+        return self._show_add_form(
+            "add_action", vol.Schema(_action_fields())
         )
 
     # ------------------------------------------------------------------
@@ -1284,7 +1317,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(CONF_OPTIMISTIC, default=False): cv.boolean,
             }
         )
-        return self.async_show_form(step_id="add_light", data_schema=schema)
+        return self._show_add_form("add_light", schema)
 
     # ------------------------------------------------------------------
     # Add: Cover (single form: only the name is required, all joins
@@ -1296,9 +1329,9 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
             if error:
                 return self._show_form_error("add_cover", OPT_COVERS, user_input, error)
             return self._save(OPT_COVERS, user_input)
-        return self.async_show_form(
-            step_id="add_cover",
-            data_schema=_cover_schema(device_field=self._dev_field()),
+        return self._show_add_form(
+            "add_cover",
+            _cover_schema(device_field=self._dev_field()),
         )
 
     # ------------------------------------------------------------------
@@ -1324,7 +1357,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(CONF_DIVISOR, default=1): cv.positive_int,
             }
         )
-        return self.async_show_form(step_id="add_sensor", data_schema=schema)
+        return self._show_add_form("add_sensor", schema)
 
     # ------------------------------------------------------------------
     # Add: Binary sensor
@@ -1347,7 +1380,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 ),
             }
         )
-        return self.async_show_form(step_id="add_binary_sensor", data_schema=schema)
+        return self._show_add_form("add_binary_sensor", schema)
 
     # ------------------------------------------------------------------
     # Add: Climate
@@ -1363,9 +1396,9 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 user_input.pop("presets_text", "")
             )
             return self._save(OPT_CLIMATES, user_input)
-        return self.async_show_form(
-            step_id="add_climate",
-            data_schema=_climate_schema(device_field=self._dev_field()),
+        return self._show_add_form(
+            "add_climate",
+            _climate_schema(device_field=self._dev_field()),
         )
 
     # ------------------------------------------------------------------
@@ -1415,7 +1448,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 vol.Required("sources_text", description={"suggested_value": "1:TV,2:Radio"}): cv.string,
             }
         )
-        return self.async_show_form(step_id="add_media_player", data_schema=schema)
+        return self._show_add_form("add_media_player", schema)
 
     # ------------------------------------------------------------------
     # Add: Text (serial output)
@@ -1434,7 +1467,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(CONF_OPTIMISTIC, default=True): cv.boolean,
             }
         )
-        return self.async_show_form(step_id="add_text", data_schema=schema)
+        return self._show_add_form("add_text", schema)
 
     # ------------------------------------------------------------------
     # Add: Number (analog output)
@@ -1459,7 +1492,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(CONF_OPTIMISTIC, default=True): cv.boolean,
             }
         )
-        return self.async_show_form(step_id="add_number", data_schema=schema)
+        return self._show_add_form("add_number", schema)
 
     # ------------------------------------------------------------------
     # Add: Button (digital pulse output)
@@ -1479,7 +1512,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                 vol.Required(CONF_BUTTON_JOIN): cv.positive_int,
             }
         )
-        return self.async_show_form(step_id="add_button", data_schema=schema)
+        return self._show_add_form("add_button", schema)
 
     # ------------------------------------------------------------------
     # Devices (group entities under named devices)

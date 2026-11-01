@@ -55,7 +55,7 @@
       },
       "add_switch": {
         "title": "Add switch",
-        "description": "For all field details, examples and wiring screenshots, see the [Switch help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/switch.md). Join direction: (XSIG in -> HA) = data sent by the processor, (XSIG out <- HA) = data sent to the processor, (XSIG in+out) = both.",
+        "description": "For all field details, examples and wiring screenshots, see the [Switch help guide]({help_url}). Join direction: (XSIG in -> HA) = data sent by the processor, (XSIG out <- HA) = data sent to the processor, (XSIG in+out) = both.",
         "data": {
           "name": "Name",
           "switch_join": "Digital join (XSIG in+out: state feedback + command)",
@@ -71,7 +71,7 @@
       },
       "add_light": {
         "title": "Add light",
-        "description": "For all field details, examples and wiring screenshots, see the [Light help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/light.md). Join direction: (XSIG in -> HA) = data sent by the processor, (XSIG out <- HA) = data sent to the processor, (XSIG in+out) = both. Configure all three RGB joins together, use distinct analog join numbers for brightness and RGB, or leave RGB empty for brightness-only operation.",
+        "description": "For all field details, examples and wiring screenshots, see the [Light help guide]({help_url}). Join direction: (XSIG in -> HA) = data sent by the processor, (XSIG out <- HA) = data sent to the processor, (XSIG in+out) = both. Configure all three RGB joins together, use distinct analog join numbers for brightness and RGB, or leave RGB empty for brightness-only operation.",
         "data": {
           "name": "Name",
           "brightness_join": "Analog join - brightness (XSIG in+out)",
@@ -89,7 +89,7 @@
       },
       "add_cover": {
         "title": "Add cover",
-        "description": "For all field details, examples and wiring screenshots, see the [Cover help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/cover.md). Only the name is required. Configure the joins your setup actually has, combining them freely: digital pulses, analog position and feedback. Directions: (XSIG in -> HA) = sent by the processor, (XSIG out <- HA) = sent to the processor, (XSIG in+out) = both sides. Commands are sent on every configured channel (e.g. open pulses the open join AND sets the position to 65535 when both exist).",
+        "description": "For all field details, examples and wiring screenshots, see the [Cover help guide]({help_url}). Only the name is required. Configure the joins your setup actually has, combining them freely: digital pulses, analog position and feedback. Directions: (XSIG in -> HA) = sent by the processor, (XSIG out <- HA) = sent to the processor, (XSIG in+out) = both sides. Commands are sent on every configured channel (e.g. open pulses the open join AND sets the position to 65535 when both exist).",
         "data": {
           "name": "Name",
           "cover_type": "Cover type (optional)",
@@ -112,7 +112,7 @@
       },
       "add_sensor": {
         "title": "Add sensor",
-        "description": "For all field details, examples and wiring screenshots, see the [Sensor help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/sensor.md). A sensor reads a value sent by the processor. Join direction: (XSIG in -> HA).",
+        "description": "For all field details, examples and wiring screenshots, see the [Sensor help guide]({help_url}). A sensor reads a value sent by the processor. Join direction: (XSIG in -> HA).",
         "data": {
           "name": "Name",
           "value_join": "Analog join (XSIG in -> HA)",
@@ -128,7 +128,7 @@
       },
       "add_binary_sensor": {
         "title": "Add binary sensor",
-        "description": "For all field details, examples and wiring screenshots, see the [Binary sensor help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/binary-sensor.md). A binary sensor reads a state sent by the processor. Join direction: (XSIG in -> HA).",
+        "description": "For all field details, examples and wiring screenshots, see the [Binary sensor help guide]({help_url}). A binary sensor reads a state sent by the processor. Join direction: (XSIG in -> HA).",
         "data": {
           "name": "Name",
           "is_on_join": "Digital join (XSIG in -> HA)",
@@ -142,7 +142,7 @@
       },
       "add_climate": {
         "title": "Add climate (thermostat)",
-        "description": "For all field details, examples and wiring screenshots, see the [Climate / thermostat help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/climate.md). Only the name and the current temperature are required. One setpoint join = single setpoint, two = heat/cool range. Directions: (XSIG in -> HA) = sent by the processor, (XSIG out <- HA) = sent to the processor, (XSIG in+out) = both. Stage/valve feedback (H1/H2/C1/C2/FA) is read-only: wire the active stages or the valve command there so HA can show the HVAC action.",
+        "description": "For all field details, examples and wiring screenshots, see the [Climate / thermostat help guide]({help_url}). Only the name and the current temperature are required. One setpoint join = single setpoint, two = heat/cool range. Directions: (XSIG in -> HA) = sent by the processor, (XSIG out <- HA) = sent to the processor, (XSIG in+out) = both. Stage/valve feedback (H1/H2/C1/C2/FA) is read-only: wire the active stages or the valve command there so HA can show the HVAC action.",
         "data": {
           "name": "Name",
           "reg_temp_join": "Analog join - current temperature, degrees x10 (XSIG in -> HA)",
@@ -179,7 +179,7 @@
       },
       "add_media_player": {
         "title": "Add media player",
-        "description": "For all field details, examples and wiring screenshots, see the [Media player help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/media-player.md). Volume and source are read AND written (in+out); volume up/down are pulses to the processor.",
+        "description": "For all field details, examples and wiring screenshots, see the [Media player help guide]({help_url}). Volume and source are read AND written (in+out); volume up/down are pulses to the processor.",
         "data": {
           "name": "Name",
           "mute_join": "Digital join - mute (XSIG in+out)",
@@ -282,7 +282,7 @@
       },
       "add_text": {
         "title": "Add text (serial output)",
-        "description": "For all field details, examples and wiring screenshots, see the [Text help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/text.md). Sends a text string to a serial join of the processor. Join direction: (XSIG out <- HA); if your program also feeds the value back on the same number (XSIG in), the entity shows it.",
+        "description": "For all field details, examples and wiring screenshots, see the [Text help guide]({help_url}). Sends a text string to a serial join of the processor. Join direction: (XSIG out <- HA); if your program also feeds the value back on the same number (XSIG in), the entity shows it.",
         "data": {
           "name": "Name",
           "serial_join": "Serial join (XSIG out <- HA)",
@@ -296,7 +296,7 @@
       },
       "add_number": {
         "title": "Add number (analog output)",
-        "description": "For all field details, examples and wiring screenshots, see the [Number help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/number.md). Controls an analog join of the processor from a slider/box. Join direction: (XSIG out <- HA); if your program also feeds the value back on the same number (XSIG in), the entity shows it.",
+        "description": "For all field details, examples and wiring screenshots, see the [Number help guide]({help_url}). Controls an analog join of the processor from a slider/box. Join direction: (XSIG out <- HA); if your program also feeds the value back on the same number (XSIG in), the entity shows it.",
         "data": {
           "name": "Name",
           "value_join": "Analog join (XSIG out <- HA)",
@@ -314,7 +314,7 @@
       },
       "add_button": {
         "title": "Add button (digital pulse)",
-        "description": "For all field details, examples and wiring screenshots, see the [Button help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/button.md). Pressing the button pulses a digital join (momentary on/off), like a script action. Join direction: (XSIG out <- HA).",
+        "description": "For all field details, examples and wiring screenshots, see the [Button help guide]({help_url}). Pressing the button pulses a digital join (momentary on/off), like a script action. Join direction: (XSIG out <- HA).",
         "data": {
           "name": "Name",
           "button_join": "Digital join (XSIG out <- HA)",
@@ -327,7 +327,7 @@
       },
       "add_expose": {
         "title": "Add expose (HA -> Crestron)",
-        "description": "Bridge rule: sends the state of a Home Assistant entity (or a template) to a Crestron join. Join format: d123 / a123 / s123. For all field details, examples and wiring screenshots, see the [Expose help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/expose.md).",
+        "description": "Bridge rule: sends the state of a Home Assistant entity (or a template) to a Crestron join. Join format: d123 / a123 / s123. For all field details, examples and wiring screenshots, see the [Expose help guide]({help_url}).",
         "data": {
           "name": "Name",
           "join": "Join to write to (e.g. a101, d451, s7)",
@@ -338,7 +338,7 @@
       },
       "add_action": {
         "title": "Add action (Crestron -> HA)",
-        "description": "Bridge rule: when the join is received, runs a Home Assistant action with {{ value }} available. For all field details, examples and wiring screenshots, see the [Action help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/action.md).",
+        "description": "Bridge rule: when the join is received, runs a Home Assistant action with {{ value }} available. For all field details, examples and wiring screenshots, see the [Action help guide]({help_url}).",
         "data": {
           "name": "Name",
           "join": "Join to react to (e.g. d451, a101, s7)",
