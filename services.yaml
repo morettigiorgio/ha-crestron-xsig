@@ -1,0 +1,105 @@
+# Services exposed by the Crestron XSIG integration.
+# These let you interact with raw joins directly, e.g. from automations
+# or scripts, without needing a dedicated entity.
+
+set_digital:
+  name: Set digital join
+  description: Sets the state (on/off) of a digital join on the Crestron processor.
+  fields:
+    join:
+      name: Join number
+      description: The digital join number to set (1-4096).
+      required: true
+      example: 5
+      selector:
+        number:
+          min: 1
+          max: 4096
+          mode: box
+    value:
+      name: State
+      description: True for ON, false for OFF.
+      required: true
+      example: true
+      selector:
+        boolean:
+    entry_id:
+      name: Processor
+      description: Which Crestron processor to target. Optional when only one is configured.
+      required: false
+      selector:
+        config_entry:
+          integration: crestron_xsig
+
+set_analog:
+  name: Set analog join
+  description: Sets the value of an analog join on the Crestron processor.
+  fields:
+    join:
+      name: Join number
+      description: The analog join number to set (1-1024).
+      required: true
+      example: 10
+      selector:
+        number:
+          min: 1
+          max: 1024
+          mode: box
+    value:
+      name: Value
+      description: Analog value to send (0-65535).
+      required: true
+      example: 32768
+      selector:
+        number:
+          min: 0
+          max: 65535
+          mode: box
+    entry_id:
+      name: Processor
+      description: Which Crestron processor to target. Optional when only one is configured.
+      required: false
+      selector:
+        config_entry:
+          integration: crestron_xsig
+
+set_serial:
+  name: Set serial join
+  description: Sends a string to a serial join on the Crestron processor.
+  fields:
+    join:
+      name: Join number
+      description: The serial join number to set (1-1024).
+      required: true
+      example: 20
+      selector:
+        number:
+          min: 1
+          max: 1024
+          mode: box
+    value:
+      name: String
+      description: Text to send to the serial join.
+      required: true
+      example: "Turn on TV"
+      selector:
+        text:
+    entry_id:
+      name: Processor
+      description: Which Crestron processor to target. Optional when only one is configured.
+      required: false
+      selector:
+        config_entry:
+          integration: crestron_xsig
+
+reload_connection:
+  name: Reload connection
+  description: Reloads one processor connection, or all processors when no target is selected.
+  fields:
+    entry_id:
+      name: Processor
+      description: Which Crestron processor to reload. Leave empty to reload all configured processors.
+      required: false
+      selector:
+        config_entry:
+          integration: crestron_xsig

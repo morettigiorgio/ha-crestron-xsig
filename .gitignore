@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.storage/
+.venv/
+venv/
+AGENTS.md
+
+# Local-only maintainer material; keep it out of release snapshots.
+/_private/
+/_todo/
+/tools/dump_xsig_config.py
+/docs/BASELINE-TEST-REPORT.md
+/docs/ROADMAP.md
+/docs/drafts/
+/docs/test-logs/
+/docs/Xsig documentation.docx
+/legancy/crestron.yaml
+
+# Test/runtime artifacts.
+.pytest_cache/
+.ruff_cache/
+pytest-cache-files-*/

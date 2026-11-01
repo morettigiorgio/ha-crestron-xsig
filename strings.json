@@ -1,0 +1,413 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Crestron processor",
+        "description": "Home Assistant will open a TCP server on this port. Configure your Crestron program to connect to Home Assistant's IP address on this port using the XSIG symbol.",
+        "data": {
+          "port": "Port"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This port is already configured."
+    }
+  },
+  "options": {
+    "error": {
+      "invalid_join": "Invalid join: use d123 (digital), a123 (analog) or s123 (serial).",
+      "join_out_of_range": "Join out of range: digital joins go from 1 to 4096, analog and serial joins from 1 to 1024.",
+      "invalid_divisor": "Invalid divisor: it must be greater than 0 (10 = one decimal, 1 = no decimals).",
+      "invalid_temp_unit": "Choose Home Assistant unit, Celsius, or Fahrenheit for processor temperatures.",
+      "invalid_mute_mode": "Choose a supported mute join behavior.",
+      "invalid_number_range": "Invalid range: maximum value must be greater than minimum value and the step must be greater than 0.",
+      "brightness_out_of_range": "Default brightness must be an integer between 0 and 255.",
+      "rgb_joins_incomplete": "Configure all three RGB joins (red, green and blue), or leave all three empty.",
+      "duplicate_light_joins": "Brightness and RGB joins must use distinct analog join numbers.",
+      "value_out_of_range": "Value out of range: the analog range is 0-65535.",
+      "invalid_presets": "Invalid presets: use 'Name:join' pairs with digital joins 1-4096 (e.g. Home:21).",
+      "invalid_sources": "Invalid sources: use 'number:name' pairs (e.g. 1:TV).",
+      "missing_join": "A join is required (e.g. a101, d451, s7).",
+      "missing_source": "Provide a value_template or an entity_id (at least one).",
+      "invalid_legacy_yaml": "{error}"
+    },
+    "step": {
+      "init": {
+        "title": "Crestron XSIG entities",
+        "menu_options": {
+          "add_switch": "Add switch",
+          "add_light": "Add light",
+          "add_cover": "Add cover",
+          "add_sensor": "Add sensor",
+          "add_binary_sensor": "Add binary sensor",
+          "add_climate": "Add climate (thermostat)",
+          "add_media_player": "Add media player",
+          "add_text": "Add text (serial output)",
+          "add_number": "Add number (analog output)",
+          "add_button": "Add button (digital pulse)",
+          "edit_entity": "Edit an entity",
+          "remove_entity": "Remove an entity",
+          "add_expose": "Add expose (HA -> Crestron)",
+          "add_action": "Add action (Crestron -> HA)",
+          "import_legacy": "Import legacy crestron.yaml",
+          "manage_devices": "Manage devices (group entities under devices)"
+        }
+      },
+      "add_switch": {
+        "title": "Add switch",
+        "description": "For all field details, examples and wiring screenshots, see the [Switch help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/switch.md). Join direction: (XSIG in -> HA) = data sent by the processor, (XSIG out <- HA) = data sent to the processor, (XSIG in+out) = both.",
+        "data": {
+          "name": "Name",
+          "switch_join": "Digital join (XSIG in+out: state feedback + command)",
+          "device_class": "Device class",
+          "optimistic": "Optimistic: update the state immediately, without waiting for the processor to echo the join back",
+          "state_sync": "State sync: keep the XSIG join updated with the real state of the entity, also when it changes for reasons other than your command (e.g. feedback from Crestron). Use ONLY if your program reads this join as a level (on/off state), not as a pulse/toggle command: a pulse-driven program could oscillate.",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_light": {
+        "title": "Add light",
+        "description": "For all field details, examples and wiring screenshots, see the [Light help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/light.md). Join direction: (XSIG in -> HA) = data sent by the processor, (XSIG out <- HA) = data sent to the processor, (XSIG in+out) = both. Configure all three RGB joins together, use distinct analog join numbers for brightness and RGB, or leave RGB empty for brightness-only operation.",
+        "data": {
+          "name": "Name",
+          "brightness_join": "Analog join - brightness (XSIG in+out)",
+          "brightness_default": "Default brightness when turned on without a level (0-255)",
+          "red_join": "Analog join - red (XSIG in+out; configure with green and blue)",
+          "green_join": "Analog join - green (XSIG in+out; configure with red and blue)",
+          "blue_join": "Analog join - blue (XSIG in+out; configure with red and green)",
+          "optimistic": "Optimistic: update the state immediately, without waiting for the processor to echo the join back",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_cover": {
+        "title": "Add cover",
+        "description": "For all field details, examples and wiring screenshots, see the [Cover help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/cover.md). Only the name is required. Configure the joins your setup actually has, combining them freely: digital pulses, analog position and feedback. Directions: (XSIG in -> HA) = sent by the processor, (XSIG out <- HA) = sent to the processor, (XSIG in+out) = both sides. Commands are sent on every configured channel (e.g. open pulses the open join AND sets the position to 65535 when both exist).",
+        "data": {
+          "name": "Name",
+          "cover_type": "Cover type (optional)",
+          "open_join": "Digital join - open pulse (XSIG out <- HA, optional)",
+          "close_join": "Digital join - close pulse (XSIG out <- HA, optional)",
+          "stop_join": "Digital join - stop pulse (XSIG out <- HA, optional)",
+          "pos_join": "Analog join - position 0-65535 (XSIG in+out, optional)",
+          "is_opening_join": "Digital join - is opening (XSIG in -> HA, optional)",
+          "is_closing_join": "Digital join - is closing (XSIG in -> HA, optional)",
+          "is_closed_join": "Digital join - is closed (XSIG in -> HA, optional)",
+          "is_opened_join": "Digital join - is opened / fully open (XSIG in -> HA, optional)",
+          "position_commands": "Also send the position command (0/65535) together with the open/close pulses",
+          "optimistic": "Optimistic: update the state immediately, without waiting for the processor to echo the join back",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_sensor": {
+        "title": "Add sensor",
+        "description": "For all field details, examples and wiring screenshots, see the [Sensor help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/sensor.md). A sensor reads a value sent by the processor. Join direction: (XSIG in -> HA).",
+        "data": {
+          "name": "Name",
+          "value_join": "Analog join (XSIG in -> HA)",
+          "device_class": "Device class (optional)",
+          "unit_of_measurement": "Unit of measurement (optional)",
+          "divisor": "Divisor (raw value is divided by this)",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_binary_sensor": {
+        "title": "Add binary sensor",
+        "description": "For all field details, examples and wiring screenshots, see the [Binary sensor help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/binary-sensor.md). A binary sensor reads a state sent by the processor. Join direction: (XSIG in -> HA).",
+        "data": {
+          "name": "Name",
+          "is_on_join": "Digital join (XSIG in -> HA)",
+          "device_class": "Device class (optional)",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_climate": {
+        "title": "Add climate (thermostat)",
+        "description": "For all field details, examples and wiring screenshots, see the [Climate / thermostat help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/climate.md). Only the name and the current temperature are required. One setpoint join = single setpoint, two = heat/cool range. Directions: (XSIG in -> HA) = sent by the processor, (XSIG out <- HA) = sent to the processor, (XSIG in+out) = both. Stage/valve feedback (H1/H2/C1/C2/FA) is read-only: wire the active stages or the valve command there so HA can show the HVAC action.",
+        "data": {
+          "name": "Name",
+          "reg_temp_join": "Analog join - current temperature, degrees x10 (XSIG in -> HA)",
+          "heat_sp_join": "Analog join - heat setpoint, degrees x10 (XSIG in+out, optional)",
+          "cool_sp_join": "Analog join - cool setpoint, degrees x10 (XSIG in+out, optional; omit for single-setpoint thermostats)",
+          "temp_divisor": "Temperature divisor: raw join value = degrees x divisor (default 10)",
+          "temp_unit": "Processor temperature unit (Home Assistant unit, °C, or °F)",
+          "humidity_divisor": "Humidity divisor: raw join value = percent x divisor (default 1)",
+          "min_temp": "Minimum setpoint temperature (optional)",
+          "max_temp": "Maximum setpoint temperature (optional)",
+          "temp_step": "Setpoint step, e.g. 0.5 (optional)",
+          "mode_heat_join": "Digital join - mode heat (XSIG in+out, optional)",
+          "mode_cool_join": "Digital join - mode cool (XSIG in+out, optional)",
+          "mode_auto_join": "Digital join - mode auto (XSIG in+out, optional)",
+          "mode_off_join": "Digital join - mode off (XSIG in+out, optional)",
+          "mode_fan_only_join": "Digital join - mode fan only (XSIG in+out, optional)",
+          "mode_dry_join": "Digital join - mode dry (XSIG in+out, optional)",
+          "fan_on_join": "Digital join - fan on (XSIG in+out, optional)",
+          "fan_auto_join": "Digital join - fan auto (XSIG in+out, optional)",
+          "h1_join": "Digital join - heat stage 1 / heating valve active (XSIG in -> HA, optional)",
+          "h2_join": "Digital join - heat stage 2 active (XSIG in -> HA, optional)",
+          "c1_join": "Digital join - cool stage 1 / cooling valve active (XSIG in -> HA, optional)",
+          "c2_join": "Digital join - cool stage 2 active (XSIG in -> HA, optional)",
+          "fa_join": "Digital join - fan active (XSIG in -> HA, optional)",
+          "humidity_join": "Analog join - current humidity, percent (XSIG in -> HA, optional)",
+          "target_humidity_join": "Analog join - target humidity, percent (XSIG in+out, optional)",
+          "presets_text": "Presets, as \"name:join\" digital pairs separated by commas (e.g. Home:21,Away:22,Sleep:23)",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_media_player": {
+        "title": "Add media player",
+        "description": "For all field details, examples and wiring screenshots, see the [Media player help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/media-player.md). Volume and source are read AND written (in+out); volume up/down are pulses to the processor.",
+        "data": {
+          "name": "Name",
+          "mute_join": "Digital join - mute (XSIG in+out)",
+          "mute_mode": "Mute behavior: toggle pulse or explicit ON/OFF state",
+          "volume_up_join": "Digital join - volume up pulse (XSIG out <- HA)",
+          "volume_down_join": "Digital join - volume down pulse (XSIG out <- HA)",
+          "volume_join": "Analog join - volume level (XSIG in+out)",
+          "source_number_join": "Analog join - source number (XSIG in+out)",
+          "sources_text": "Sources, as \"number:name\" pairs separated by commas (e.g. 1:TV,2:Radio)",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "edit_entity": {
+        "title": "Edit an entity",
+        "data": {
+          "entity": "Select the entity to edit"
+        }
+      },
+      "edit_form": {
+        "title": "Edit entity",
+        "description": "For type-specific field details, examples and wiring screenshots, see the [matching help guide]({help_url}). The entity keeps its identity and history; only these settings change. Join direction: (XSIG in -> HA) = sent by the processor, (XSIG out <- HA) = sent to the processor, (XSIG in+out) = both.",
+        "data": {
+          "name": "Name",
+          "device_class": "Device class",
+          "unit_of_measurement": "Unit of measurement",
+          "divisor": "Divisor (raw value is divided by this)",
+          "switch_join": "Digital join (XSIG in+out)",
+          "brightness_join": "Analog join - brightness (XSIG in+out)",
+          "brightness_default": "Default brightness when turned on without a level (0-255)",
+          "red_join": "Analog join - red (XSIG in+out; configure with green and blue)",
+          "green_join": "Analog join - green (XSIG in+out; configure with red and blue)",
+          "blue_join": "Analog join - blue (XSIG in+out; configure with red and green)",
+          "cover_type": "Cover type",
+          "pos_join": "Analog join - position (XSIG in+out)",
+          "open_join": "Digital join - open pulse (XSIG out <- HA)",
+          "close_join": "Digital join - close pulse (XSIG out <- HA)",
+          "is_opening_join": "Digital join - is opening (XSIG in -> HA)",
+          "is_closing_join": "Digital join - is closing (XSIG in -> HA)",
+          "is_closed_join": "Digital join - is closed (XSIG in -> HA)",
+          "stop_join": "Digital join - stop pulse (XSIG out <- HA)",
+          "value_join": "Analog join (XSIG in -> HA)",
+          "is_on_join": "Digital join (XSIG in -> HA)",
+          "heat_sp_join": "Analog join - heat setpoint, degrees x10 (XSIG in+out)",
+          "cool_sp_join": "Analog join - cool setpoint, degrees x10 (XSIG in+out)",
+          "temp_divisor": "Temperature divisor: raw join value = degrees x divisor (default 10)",
+          "temp_unit": "Processor temperature unit (Home Assistant unit, °C, or °F)",
+          "humidity_divisor": "Humidity divisor: raw join value = percent x divisor (default 1)",
+          "reg_temp_join": "Analog join - current temperature, degrees x10 (XSIG in -> HA)",
+          "mode_heat_join": "Digital join - mode heat (XSIG in+out)",
+          "mode_cool_join": "Digital join - mode cool (XSIG in+out)",
+          "mode_auto_join": "Digital join - mode auto (XSIG in+out)",
+          "mode_off_join": "Digital join - mode off (XSIG in+out)",
+          "fan_on_join": "Digital join - fan on (XSIG in+out)",
+          "fan_auto_join": "Digital join - fan auto (XSIG in+out)",
+          "h1_join": "Digital join - heat stage 1 / heating valve active (XSIG in -> HA)",
+          "h2_join": "Digital join - heat stage 2 active (XSIG in -> HA)",
+          "c1_join": "Digital join - cool stage 1 / cooling valve active (XSIG in -> HA)",
+          "c2_join": "Digital join - cool stage 2 active (XSIG in -> HA)",
+          "fa_join": "Digital join - fan active (XSIG in -> HA)",
+          "mute_join": "Digital join - mute (XSIG in+out)",
+          "mute_mode": "Mute behavior: toggle pulse or explicit ON/OFF state",
+          "volume_up_join": "Digital join - volume up pulse (XSIG out <- HA)",
+          "volume_down_join": "Digital join - volume down pulse (XSIG out <- HA)",
+          "volume_join": "Analog join - volume level (XSIG in+out)",
+          "source_number_join": "Analog join - source number (XSIG in+out)",
+          "sources_text": "Sources, as \"number:name\" pairs separated by commas (e.g. 1:TV,2:Radio)",
+          "optimistic": "Optimistic: update the state immediately, without waiting for the processor to echo the join back",
+          "state_sync": "State sync: keep the XSIG join updated with the real state of the entity, also when it changes for reasons other than your command (e.g. feedback from Crestron). Use ONLY if your program reads this join as a level (on/off state), not as a pulse/toggle command: a pulse-driven program could oscillate.",
+          "is_opened_join": "Digital join - is opened / fully open (XSIG in -> HA)",
+          "position_commands": "Also send the position command (0/65535) together with the open/close pulses",
+          "serial_join": "Serial join (XSIG out <- HA)",
+          "min_value": "Minimum value",
+          "max_value": "Maximum value",
+          "step": "Step",
+          "button_join": "Digital join (XSIG out <- HA)",
+          "min_temp": "Minimum setpoint temperature",
+          "max_temp": "Maximum setpoint temperature",
+          "temp_step": "Setpoint step, e.g. 0.5",
+          "mode_fan_only_join": "Digital join - mode fan only (XSIG in+out)",
+          "mode_dry_join": "Digital join - mode dry (XSIG in+out)",
+          "humidity_join": "Analog join - current humidity, percent (XSIG in -> HA)",
+          "target_humidity_join": "Analog join - target humidity, percent (XSIG in+out)",
+          "presets_text": "Presets, as \"name:join\" digital pairs separated by commas (e.g. Home:21,Away:22)",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "remove_entity": {
+        "title": "Remove entities",
+        "data": {
+          "entities": "Select the entities to remove"
+        }
+      },
+      "add_text": {
+        "title": "Add text (serial output)",
+        "description": "For all field details, examples and wiring screenshots, see the [Text help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/text.md). Sends a text string to a serial join of the processor. Join direction: (XSIG out <- HA); if your program also feeds the value back on the same number (XSIG in), the entity shows it.",
+        "data": {
+          "name": "Name",
+          "serial_join": "Serial join (XSIG out <- HA)",
+          "optimistic": "Optimistic: show the sent value immediately as the entity state",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_number": {
+        "title": "Add number (analog output)",
+        "description": "For all field details, examples and wiring screenshots, see the [Number help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/number.md). Controls an analog join of the processor from a slider/box. Join direction: (XSIG out <- HA); if your program also feeds the value back on the same number (XSIG in), the entity shows it.",
+        "data": {
+          "name": "Name",
+          "value_join": "Analog join (XSIG out <- HA)",
+          "min_value": "Minimum value (default 0)",
+          "max_value": "Maximum value (default 65535)",
+          "step": "Step (default 1)",
+          "unit_of_measurement": "Unit of measurement (optional)",
+          "optimistic": "Optimistic: show the sent value immediately as the entity state",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_button": {
+        "title": "Add button (digital pulse)",
+        "description": "For all field details, examples and wiring screenshots, see the [Button help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/button.md). Pressing the button pulses a digital join (momentary on/off), like a script action. Join direction: (XSIG out <- HA).",
+        "data": {
+          "name": "Name",
+          "button_join": "Digital join (XSIG out <- HA)",
+          "entity_category": "Entity category (optional)",
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "Where this entity is shown: the integration (Crestron processor), a device created in 'Manage devices', or an existing Home Assistant device."
+        }
+      },
+      "add_expose": {
+        "title": "Add expose (HA -> Crestron)",
+        "description": "Bridge rule: sends the state of a Home Assistant entity (or a template) to a Crestron join. Join format: d123 / a123 / s123. For all field details, examples and wiring screenshots, see the [Expose help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/expose.md).",
+        "data": {
+          "name": "Name",
+          "join": "Join to write to (e.g. a101, d451, s7)",
+          "value_template": "Template of the HA value (leave empty if using an entity)",
+          "entity_id": "Entity to expose (optional if using a template)",
+          "attribute": "Attribute of the entity to expose (optional)"
+        }
+      },
+      "add_action": {
+        "title": "Add action (Crestron -> HA)",
+        "description": "Bridge rule: when the join is received, runs a Home Assistant action with {{ value }} available. For all field details, examples and wiring screenshots, see the [Action help guide](https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/action.md).",
+        "data": {
+          "name": "Name",
+          "join": "Join to react to (e.g. d451, a101, s7)",
+          "trigger_on": "When to trigger a digital join",
+          "script": "Actions to run ({{ value }} = received value)"
+        }
+      },
+      "import_legacy": {
+        "title": "Import legacy crestron.yaml",
+        "description": "Paste the content of the old crestron.yaml here, then confirm. to_joins become exposes (HA -> Crestron), from_joins become actions (Crestron -> HA).",
+        "data": {
+          "yaml_text": "Legacy crestron.yaml content",
+          "overwrite": "Replace existing expose/action rules with imported rules (if unchecked, keep existing rules and add the imported ones)"
+        }
+      },
+      "import_confirm": {
+        "title": "Import summary",
+        "description": "Found {exposes} exposes (HA -> Crestron) and {actions} actions (Crestron -> HA).\n\n{port_note}\n\nWarnings:\n{warnings}",
+        "data": {
+          "overwrite": "Replace existing expose/action rules with imported rules (if unchecked, keep existing rules and add the imported ones)"
+        }
+      },
+      "manage_devices": {
+        "title": "Manage devices",
+        "description": "Devices group entities in the Home Assistant UI. Assign each entity to one of these devices from its own form; entities with no device stay under the integration (Crestron processor).",
+        "menu_options": {
+          "add_device": "Add a device",
+          "edit_device": "Edit a device",
+          "remove_device": "Remove devices"
+        }
+      },
+      "add_device": {
+        "title": "Add device",
+        "description": "Create a device of this integration. It shows up in the devices list and entities assigned to it are grouped under it.",
+        "data": {
+          "name": "Name",
+          "manufacturer": "Manufacturer",
+          "model": "Model",
+          "suggested_area": "Suggested area"
+        }
+      },
+      "edit_device": {
+        "title": "Edit device",
+        "data": {
+          "device": "Device"
+        }
+      },
+      "edit_device_form": {
+        "title": "Edit device",
+        "data": {
+          "name": "Name",
+          "manufacturer": "Manufacturer",
+          "model": "Model",
+          "suggested_area": "Suggested area"
+        }
+      },
+      "remove_device": {
+        "title": "Remove devices",
+        "description": "Entities assigned to a removed device go back to the integration device. The device itself is deleted.",
+        "data": {
+          "devices": "Devices"
+        }
+      }
+    },
+    "abort": {
+      "no_entities": "There are no entities configured yet.",
+      "import_cancelled": "Import cancelled — nothing was changed.",
+      "no_rules_found": "The YAML contains no to_joins / from_joins rules to import.",
+      "no_devices": "No custom devices have been created yet."
+    }
+  }
+}
