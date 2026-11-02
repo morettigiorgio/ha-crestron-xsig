@@ -22,18 +22,6 @@ UI, and bridges between existing Home Assistant entities and Crestron.
    connection. Connect the client to an XSIG (Intersystem Communication)
    symbol and wire the signals to the appropriate joins.
 
-### HACS installation
-
-After this GitHub repository is public, add it in HACS as a custom
-repository with category **Integration**, then install **Crestron XSIG**.
-The repository uses HACS `content_in_root` layout; see `hacs.json`.
-The installation flow has not yet been smoke-tested. Alternatively, follow the
-manual installation steps above.
-
-See [docs/WIRING.md](docs/WIRING.md) for join directions, signal
-scaling and XSIG-specific wiring notes, or [docs/help/README.md](docs/help/README.md)
-for the Add/Edit guides and screenshots.
-
 ## Configuration and features
 
 Use **Settings → Devices & Services → Crestron XSIG → Configure** to
