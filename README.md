@@ -101,8 +101,13 @@ privately; do not post processor credentials or personal configuration data.
 ## License and attribution
 
 This project is licensed under the Apache License 2.0; see [LICENSE](LICENSE).
-It builds on work by Nick Pope and Georges Khalil. See
-[docs/TRANSPARENCY.md](docs/TRANSPARENCY.md) for upstream attribution.
+It continues the work of Nick Pope and Georges Khalil, whose contributions are
+gratefully acknowledged. See [docs/TRANSPARENCY.md](docs/TRANSPARENCY.md) for
+upstream attribution and project history.
+
+This repository is maintained by Giorgio Moretti and has been developed with
+substantial assistance from an AI coding assistant. Giorgio reviews and is
+responsible for the changes published here.
 
 ## Support
 If you like my work and want to support me, you can buy me a coffee!
