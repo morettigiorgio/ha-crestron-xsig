@@ -103,3 +103,8 @@ privately; do not post processor credentials or personal configuration data.
 This project is licensed under the Apache License 2.0; see [LICENSE](LICENSE).
 It builds on work by Nick Pope and Georges Khalil. See
 [docs/TRANSPARENCY.md](docs/TRANSPARENCY.md) for upstream attribution.
+
+## Support
+If you like my work and want to support me, you can buy me a coffee!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K21T8I02)
