@@ -145,7 +145,7 @@ else adapts to the thermostat you actually have.
 | fa | XSIG in -> HA | fan actually running |
 | humidity_join (analog) | XSIG in -> HA | current humidity (raw = percent x humidity_divisor) |
 | target_humidity_join (analog) | XSIG in+out | target humidity (same scaling) |
-| presets_text | (config) | one digital join per preset, `Name:join` pairs (e.g. `Home:21,Away:22`) — HA sets one high at a time |
+| presets_text | XSIG out <- HA | one digital join per preset (Xsig digital pulse out), `Name:join` pairs (e.g. `Home:21,Away:22`) — HA sets one high at a time |
 
 The `hvac_action` shown by HA (heating / cooling / fan / idle) is
 derived only from h1/h2/c1/c2/fa. If your program drives a valve, wire
