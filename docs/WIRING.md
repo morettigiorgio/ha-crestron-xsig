@@ -32,7 +32,7 @@ analog/serial and another one for digitals**, or account for the offset
 in the entity configuration.
 
 Tip (from georgesak's docs): set the XSIG symbol option to 2 ("always
-propagate values") so repeated identical values still reach HA.
+propagate values") so repeated identical values still reach HA (even if this leads to more traffic).
 
 ## Reconnect and full-state sync
 
