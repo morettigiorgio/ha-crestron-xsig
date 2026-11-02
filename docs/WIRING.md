@@ -125,7 +125,7 @@ is on — or when there is no pulse join to command with. Same for
 | volume_join (analog) | XSIG in+out | 0-65535 |
 | source_number_join (analog) | XSIG in+out | 0 = off, 1..n = source |
 
-### Climate (thermostat) — the confusing one, in detail
+### Climate (thermostat)
 Only **name** and **current temperature** are required. Everything
 else adapts to the thermostat you actually have.
 
