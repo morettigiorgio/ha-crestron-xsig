@@ -34,7 +34,7 @@ in the entity configuration.
 Tip (from georgesak's docs): set the XSIG symbol option to 2 ("always
 propagate values") so repeated identical values still reach HA (even if this leads to more traffic).
 
-## Reconnect and full-state sync
+## Reconnect and full-state sync (in case you do not want to use the 2d option for Xsig, but rather the 1d one)
 
 A full-state sync uses `0xFD`. In the tested Crestron setup, the processor
 retransmits joins with non-zero values but omits joins whose current value is
