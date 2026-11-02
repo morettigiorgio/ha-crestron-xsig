@@ -12,8 +12,8 @@ The XSIG (Intersystem Communication) symbol in your SIMPL program has:
 
 | XSIG symbol side | Data direction | In this project |
 |---|---|---|
-| **IN** signals (into the symbol, from your logic) | processor → HA | state feedback / sensor values |
-| **OUT** signals (out of the symbol, into your logic) | HA → processor | commands |
+| **IN** signals (into the symbol, from your logic) | processor → HA | Crestron state feedback / sensor values |
+| **OUT** signals (out of the symbol, into your logic) | HA → processor | commands or HA feedback |
 
 In the forms we label each field as:
 * **(XSIG in → HA)** — wire your program's signal INTO the symbol;
