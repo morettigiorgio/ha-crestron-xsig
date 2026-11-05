@@ -83,6 +83,9 @@ from .const import (
     CONF_OPTIMISTIC,
     CONF_POS_JOIN,
     CONF_PORT,
+    CONF_POSITION_SCALE,
+    POSITION_SCALE_16BIT,
+    POSITION_SCALE_PERCENT,
     CONF_POSITION_COMMANDS,
     CONF_PRESETS,
     CONF_REG_TEMP_JOIN,
@@ -550,6 +553,9 @@ def _validate_entity_form(key: str, data: dict) -> str | None:
     if key == OPT_CLIMATES and not _is_blank(data.get(CONF_TEMP_UNIT)):
         if data[CONF_TEMP_UNIT] not in (TEMP_UNIT_HA, "C", "F"):
             return "invalid_temp_unit"
+    if key == OPT_COVERS and not _is_blank(data.get(CONF_POSITION_SCALE)):
+        if data[CONF_POSITION_SCALE] not in (POSITION_SCALE_16BIT, POSITION_SCALE_PERCENT):
+            return "invalid_position_scale"
     if key == OPT_MEDIA_PLAYERS and not _is_blank(data.get(CONF_MUTE_MODE)):
         if data[CONF_MUTE_MODE] not in (
             MUTE_MODE_TOGGLE_PULSE,
@@ -712,6 +718,20 @@ def _cover_schema(item: dict | None = None, device_field: dict | None = None) ->
                 {"select": {"options": ["shade", "blind", "curtain", "generic"]}}
             ),
             opt(CONF_POS_JOIN): cv.positive_int,
+            vol.Optional(
+                CONF_POSITION_SCALE,
+                default=item.get(CONF_POSITION_SCALE, POSITION_SCALE_16BIT),
+            ): selector(
+                {
+                    "select": {
+                        "options": [
+                            {"value": POSITION_SCALE_16BIT, "label": "16-bit (0–65535)"},
+                            {"value": POSITION_SCALE_PERCENT, "label": "Percent (0–100)"},
+                        ],
+                        "mode": "dropdown",
+                    }
+                }
+            ),
             opt(CONF_OPEN_JOIN): cv.positive_int,
             opt(CONF_CLOSE_JOIN): cv.positive_int,
             opt(CONF_STOP_JOIN): cv.positive_int,

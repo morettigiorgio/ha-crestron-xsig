@@ -23,6 +23,8 @@ these will be called out explicitly.
 - Selectable media-player mute behavior (toggle pulse or explicit state) and
   selectable climate processor temperature units (Home Assistant, Celsius or
   Fahrenheit).
+- Selectable cover position range: 16-bit (0–65535, default) or direct
+  percentage (0–100).
 
 ### Fixed and improved
 

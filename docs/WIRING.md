@@ -107,15 +107,17 @@ writes. Existing lights with no RGB joins remain brightness-only.
 | Field | Direction | Note |
 |---|---|---|
 | open_join / close_join / stop_join | XSIG out ← HA | momentary pulses |
-| pos_join (analog) | XSIG in+out | `in` = position feedback (0=closed, 65535=open), `out` = position command |
+| pos_join (analog) | XSIG in+out | `in` = position feedback, `out` = position command. Select 16-bit (0=closed, 65535=open; default) or percent (0=closed, 100=open) in the cover options; HA always exposes 0–100%. |
 | is_opening / is_closing | XSIG in → HA | moving feedback |
 | is_closed | XSIG in → HA | fully-closed feedback |
 | is_opened | XSIG in → HA | fully-open feedback (HA has no "is_opened" state: this confirms "open" and fills in when is_closed is missing) |
 
 Command behavior: **open** pulses `open_join` (if configured) and
-writes 65535 to `pos_join` **only** when the *position commands* option
-is on — or when there is no pulse join to command with. Same for
-**close** (0). **Set position** always writes `pos_join`.
+writes the configured full-open value to `pos_join` **only** when the
+*position commands* option is on — or when there is no pulse join to command
+with (65535 in 16-bit mode, 100 in percent mode). Same for **close** (0).
+**Set position** always writes `pos_join`, scaled according to the selected
+range.
 
 ### Media player
 | Field | Direction | Note |

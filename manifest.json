@@ -4,7 +4,7 @@
   "codeowners": ["@morettigiorgio"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/morettigiorgio/ha-crestron-xsig",
+  "documentation": "https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/README.md",
   "import_executor": true,
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/morettigiorgio/ha-crestron-xsig/issues",

@@ -88,6 +88,15 @@ light_mod.ColorMode = enum.Enum(
     "ColorMode", {"BRIGHTNESS": "brightness", "RGB": "rgb"}
 )
 light_mod.LightEntity = type("LightEntity", (), {})
+cover_mod = _make_module("homeassistant.components.cover")
+components.cover = cover_mod
+cover_mod.CoverDeviceClass = enum.Enum(
+    "CoverDeviceClass", {"SHADE": "shade", "BLIND": "blind", "CURTAIN": "curtain"}
+)
+cover_mod.CoverEntityFeature = enum.IntFlag(
+    "CoverEntityFeature", {"OPEN": 1, "CLOSE": 2, "STOP": 4, "SET_POSITION": 8}
+)
+cover_mod.CoverEntity = type("CoverEntity", (), {})
 
 # entity/config flows look up existing devices in the device registry.
 device_registry_mod = _make_module("homeassistant.helpers.device_registry")
@@ -204,6 +213,7 @@ entity_helpers.EntityCategory = StubEntityCategory
 entity_helpers.DeviceInfo = StubDeviceInfo
 crestron_entity = importlib.import_module("crestron_xsig.entity")
 light_platform = importlib.import_module("crestron_xsig.light")
+cover_platform = importlib.import_module("crestron_xsig.cover")
 
 
 # Mimics homeassistant.helpers.config_validation.custom_serializer for the
@@ -608,6 +618,107 @@ def test_rgb_lights() -> None:
     asyncio.run(check_runtime())
 
 
+def test_cover_position_scales() -> None:
+    """Cover joins can use either native percent or the legacy 16-bit range."""
+    class FakeHub:
+        def __init__(self, value):
+            self.value = value
+            self.sent = []
+
+        def get_analog(self, join):
+            return self.value
+
+        def set_analog(self, join, value):
+            self.sent.append((join, value))
+            return True
+
+        def update_analog(self, join, value):
+            self.value = value
+
+    async def check_runtime():
+        legacy_hub = FakeHub(32768)
+        legacy = cover_platform.CrestronCover(
+            legacy_hub,
+            "entry",
+            {const.CONF_ID: "legacy-cover", const.CONF_NAME: "Legacy", const.CONF_POS_JOIN: 1},
+        )
+        assert legacy.current_cover_position == 50
+        await legacy.async_set_cover_position(position=50)
+        assert legacy_hub.sent == [(1, 32768)]
+        await legacy.async_open_cover()
+        assert legacy_hub.sent[-1] == (1, 65535)
+
+        percent_hub = FakeHub(45)
+        percent = cover_platform.CrestronCover(
+            percent_hub,
+            "entry",
+            {
+                const.CONF_ID: "percent-cover",
+                const.CONF_NAME: "Percent",
+                const.CONF_POS_JOIN: 2,
+                const.CONF_POSITION_SCALE: const.POSITION_SCALE_PERCENT,
+                const.CONF_OPTIMISTIC: True,
+            },
+        )
+        percent.async_write_ha_state = lambda: None
+        assert percent.current_cover_position == 45
+        await percent.async_set_cover_position(position=37)
+        assert percent_hub.sent == [(2, 37)]
+        assert percent.current_cover_position == 37
+        await percent.async_open_cover()
+        assert percent_hub.sent[-1] == (2, 100)
+        await percent.async_close_cover()
+        assert percent_hub.sent[-1] == (2, 0)
+        percent_hub.value = 101
+        assert percent.current_cover_position == 100
+
+        pulses = []
+        percent._pulse = pulses.append
+        percent._open_join = 3
+        percent._close_join = 4
+        percent_hub.sent.clear()
+        await percent.async_open_cover()
+        await percent.async_close_cover()
+        assert pulses == [3, 4] and not percent_hub.sent
+        percent._position_commands = True
+        await percent.async_open_cover()
+        await percent.async_close_cover()
+        assert percent_hub.sent == [(2, 100), (2, 0)]
+
+        flow = config_flow.CrestronXsigOptionsFlow(ConfigEntry())
+        flow.hass = StubHass()
+        flow.async_create_entry = lambda title="", data=None, **kwargs: {"data": data}
+        flow.async_show_form = lambda **kwargs: kwargs
+        form = await flow.async_step_add_cover()
+        markers = {getattr(key, "schema", key): key for key in form["data_schema"].schema}
+        assert markers[const.CONF_POSITION_SCALE].default() == const.POSITION_SCALE_16BIT
+        saved = await flow.async_step_add_cover({
+            const.CONF_NAME: "Percent", const.CONF_POS_JOIN: 2,
+            const.CONF_POSITION_SCALE: const.POSITION_SCALE_PERCENT,
+        })
+        item = saved["data"][const.OPT_COVERS][0]
+        assert item[const.CONF_POSITION_SCALE] == const.POSITION_SCALE_PERCENT
+        edit = config_flow.CrestronXsigOptionsFlow(ConfigEntry(saved["data"]))
+        edit.hass = StubHass()
+        edit.async_create_entry = flow.async_create_entry
+        edit.async_show_form = flow.async_show_form
+        edit._edit_key = const.OPT_COVERS
+        edit._edit_item = item
+        form = await edit.async_step_edit_form()
+        markers = {getattr(key, "schema", key): key for key in form["data_schema"].schema}
+        assert markers[const.CONF_POSITION_SCALE].default() == const.POSITION_SCALE_PERCENT
+        saved = await edit.async_step_edit_form({
+            const.CONF_NAME: "Percent", const.CONF_POS_JOIN: 2,
+            const.CONF_POSITION_SCALE: const.POSITION_SCALE_16BIT,
+        })
+        assert saved["data"][const.OPT_COVERS][0][const.CONF_POSITION_SCALE] == const.POSITION_SCALE_16BIT
+
+    assert config_flow._validate_entity_form(
+        const.OPT_COVERS, {const.CONF_POSITION_SCALE: "invalid"}
+    ) == "invalid_position_scale"
+    asyncio.run(check_runtime())
+
+
 def test_climate_temp_unit_and_media_mute_mode() -> None:
     """Check Add/Edit fields, defaults, validation, and saved option values."""
     def make_flow(options=None):
@@ -750,13 +861,19 @@ def main() -> int:
         failures += 1
         print(f"FAIL   RGB light checks: {type(err).__name__}: {err}")
     try:
+        test_cover_position_scales()
+        print("ok     cover position scales, forms, and persistence")
+    except Exception as err:  # noqa: BLE001
+        failures += 1
+        print(f"FAIL   cover position checks: {type(err).__name__}: {err}")
+    try:
         test_climate_temp_unit_and_media_mute_mode()
         print("ok     climate temp-unit and media-player mute-mode forms, validation, and persistence")
     except Exception as err:  # noqa: BLE001
         failures += 1
         print(f"FAIL   climate/mute mode checks: {type(err).__name__}: {err}")
     print()
-    print("FAILED" if failures else "all schemas and entity-category/RGB/climate/mute checks pass")
+    print("FAILED" if failures else "all schemas and entity-category/RGB/cover/climate/mute checks pass")
     return 1 if failures else 0
 
 

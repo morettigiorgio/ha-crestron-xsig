@@ -16,7 +16,11 @@ from .const import (
     CONF_OPEN_JOIN,
     CONF_OPTIMISTIC,
     CONF_POS_JOIN,
+    CONF_POSITION_SCALE,
+    POSITION_SCALE_16BIT,
+    POSITION_SCALE_PERCENT,
     CONF_POSITION_COMMANDS,
+    MAX_ANALOG_VALUE,
     CONF_STOP_JOIN,
     DATA_HUB,
     DOMAIN,
@@ -45,10 +49,10 @@ class CrestronCover(CrestronEntity, CoverEntity):
 
     All joins are optional: a setup can mix digital pulses (open/close/
     stop), an analog position command, and feedback joins in any
-    combination. Commands are sent on every configured channel: e.g.
-    "open" pulses the open join AND writes 65535 to the position join
-    when both are configured. On the SIMPL side the XSIG in/out signals
-    are separate: wire only what you use.
+    combination. Open/close pulse their configured digital joins; they
+    also write the configured position endpoint when position commands are
+    enabled, or when the corresponding pulse join is absent. On the SIMPL
+    side the XSIG in/out signals are separate: wire only what you use.
     """
 
     def __init__(self, hub, entry_id, item: dict, device_info=None):
@@ -57,6 +61,11 @@ class CrestronCover(CrestronEntity, CoverEntity):
         self._attr_device_class = _DEVICE_CLASS_MAP.get(item.get(CONF_COVER_TYPE))
         self._optimistic = item.get(CONF_OPTIMISTIC, False)
         self._position_commands = item.get(CONF_POSITION_COMMANDS, False)
+        self._pos_max = (
+            100
+            if item.get(CONF_POSITION_SCALE, POSITION_SCALE_16BIT) == POSITION_SCALE_PERCENT
+            else MAX_ANALOG_VALUE
+        )
         self._pos_join = item.get(CONF_POS_JOIN)
         self._open_join = item.get(CONF_OPEN_JOIN)
         self._close_join = item.get(CONF_CLOSE_JOIN)
@@ -87,8 +96,10 @@ class CrestronCover(CrestronEntity, CoverEntity):
     def current_cover_position(self):
         if self._pos_join is None:
             return None
-        raw_position = max(0, min(65535, self._hub.get_analog(self._pos_join)))
-        return round(raw_position * 100 / 65535)
+        raw_position = max(
+            0, min(self._pos_max, self._hub.get_analog(self._pos_join))
+        )
+        return round(raw_position * 100 / self._pos_max)
 
     @property
     def is_opening(self):
@@ -126,7 +137,8 @@ class CrestronCover(CrestronEntity, CoverEntity):
 
     async def async_set_cover_position(self, **kwargs):
         if self._pos_join is not None:
-            self._set_position(round(kwargs["position"] * 65535 / 100))
+            position = max(0, min(100, round(kwargs["position"])))
+            self._set_position(round(position * self._pos_max / 100))
 
     async def async_open_cover(self, **kwargs):
         if self._open_join:
@@ -136,7 +148,7 @@ class CrestronCover(CrestronEntity, CoverEntity):
         if self._pos_join is not None and (
             self._position_commands or not self._open_join
         ):
-            self._set_position(0xFFFF)
+            self._set_position(self._pos_max)
 
     async def async_close_cover(self, **kwargs):
         if self._close_join:
