@@ -5,6 +5,30 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and semantic versioning. Versions below `1.0.0` may include breaking changes;
 these will be called out explicitly.
 
+## [0.5.0] — Unreleased
+
+### Added
+
+- Home Assistant Marketplace support, including the integration category,
+  Marketplace installation link and updated distribution guidance. The existing
+  `hacs.json` metadata and HACS catalog validator remain required by the
+  Marketplace.
+- Downloadable JSON diagnostics for a sorted inventory of configured
+  entities, joins, exposes and actions.
+
+### Fixed
+
+- Render the legacy YAML import input as a multiline field so pasted YAML
+  retains its line breaks and indentation. The import flow has been manually
+  tested successfully in Home Assistant.
+
+### Known limitations
+
+- Marketplace installation/update has not yet been smoke-tested. The
+  Marketplace is built into Home Assistant 2026.11 and newer, replacing the
+  HACS custom integration. Use the README repository link until this project is
+  in the public catalog; older Home Assistant releases can use HACS.
+
 ## [0.4.0] — First public release
 
 > Initial public release. Add the publication date when the GitHub release is
@@ -38,5 +62,3 @@ these will be called out explicitly.
 - Import of legacy `crestron.yaml` configuration is available in the options
   flow but remains unverified and is marked as in development.
 - One Crestron TCP client is supported per configured listener.
-- HACS installation/update has not yet been smoke-tested; use the documented
-  custom-repository installation path after the repository is public.

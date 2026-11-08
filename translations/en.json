@@ -50,9 +50,14 @@
           "remove_entity": "Remove an entity",
           "add_expose": "Add expose (HA -> Crestron)",
           "add_action": "Add action (Crestron -> HA)",
+          "overview": "Overview of configured joins",
           "import_legacy": "Import legacy crestron.yaml",
           "manage_devices": "Manage devices (group entities under devices)"
         }
+      },
+      "overview": {
+        "title": "Crestron XSIG overview",
+        "description": "Inventory of configured entities, joins, exposes and actions. Script contents are not displayed. Download a JSON export from the integration's Download diagnostics menu. Review the file before sharing it, as it contains configured templates and scripts.\n\n{summary}"
       },
       "add_switch": {
         "title": "Add switch",
@@ -341,17 +346,17 @@
       },
       "add_action": {
         "title": "Add action (Crestron -> HA)",
-        "description": "Bridge rule: when the join is received, runs a Home Assistant action with {{ value }} available. For all field details, examples and wiring screenshots, see the [Action help guide]({help_url}).",
+        "description": "Bridge rule: when the join is received, runs a Home Assistant action with the received value available as `value`. For all field details, examples and wiring screenshots, see the [Action help guide]({help_url}).",
         "data": {
           "name": "Name",
           "join": "Join to react to (e.g. d451, a101, s7)",
           "trigger_on": "When to trigger a digital join",
-          "script": "Actions to run ({{ value }} = received value)"
+          "script": "Actions to run (the received value is available as `value`)"
         }
       },
       "import_legacy": {
         "title": "Import legacy crestron.yaml",
-        "description": "Paste the content of the old crestron.yaml here, then confirm. to_joins become exposes (HA -> Crestron), from_joins become actions (Crestron -> HA).",
+        "description": "Paste the complete content of the old crestron.yaml here, preserving its line breaks and indentation, then confirm. to_joins become exposes (HA -> Crestron), from_joins become actions (Crestron -> HA). You can open the file in a text editor and copy its contents; direct file upload is not supported.",
         "data": {
           "yaml_text": "Legacy crestron.yaml content",
           "overwrite": "Replace existing expose/action rules with imported rules (if unchecked, keep existing rules and add the imported ones)"

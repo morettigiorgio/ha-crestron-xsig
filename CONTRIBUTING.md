@@ -38,10 +38,13 @@ python tools/check_flows.py
 python tools/test_xsig_hub_protocol.py
 ```
 
-The GitHub Actions workflow also runs Home Assistant `hassfest` and HACS
-validation. The standalone checks are focused checks, not a substitute for a
-Home Assistant/Crestron integration test. If changing a user-facing behavior,
-record the Home Assistant and processor versions and the exact test performed.
+The GitHub Actions workflow also runs Home Assistant `hassfest` and the HACS
+catalog validator used by the built-in Home Assistant Marketplace. Marketplace
+(replacing the HACS custom integration from Home Assistant 2026.11) still uses
+`hacs.json` and the HACS validation action for catalog checks. The standalone
+checks are focused checks, not a substitute for a Home Assistant/Crestron
+integration test. If changing a user-facing behavior, record the Home Assistant
+and processor versions and the exact test performed.
 
 ## Pull requests
 

@@ -6,10 +6,10 @@ it is not a history of completed development tasks. See
 
 ## Not yet verified
 
-- **Legacy YAML import:** the `crestron.yaml` import flow is implemented but
-  its real-world test is deferred by the maintainer until synchronization with
-  the Crestron system is tested. It remains in development and should be
-  treated as unverified, including its parser and Home Assistant UI flow.
+- **Crestron synchronization after legacy import:** the legacy YAML import
+  flow has been manually tested successfully in Home Assistant, but a successful
+  live synchronization of the imported rules with a Crestron processor has not
+  yet been reported. Verify the imported joins against your processor.
 
 Report reproducible problems through the project's GitHub issue tracker.
 Avoid including credentials or private configuration data.

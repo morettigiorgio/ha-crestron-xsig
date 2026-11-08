@@ -325,6 +325,117 @@ _TYPE_LABELS = {
     OPT_ACTIONS: "Action (Crestron -> HA)",
 }
 
+_ANALOG_JOIN_FIELDS = {
+    CONF_BRIGHTNESS_JOIN,
+    CONF_RED_JOIN,
+    CONF_GREEN_JOIN,
+    CONF_BLUE_JOIN,
+    CONF_POS_JOIN,
+    CONF_VALUE_JOIN,
+    CONF_HEAT_SP_JOIN,
+    CONF_COOL_SP_JOIN,
+    CONF_REG_TEMP_JOIN,
+    CONF_HUMIDITY_JOIN,
+    CONF_TARGET_HUMIDITY_JOIN,
+    CONF_VOLUME_JOIN,
+    CONF_SOURCE_NUM_JOIN,
+}
+
+
+def _overview_join(join: str) -> tuple[str, int]:
+    """Sort a typed join naturally, with invalid legacy values at the end."""
+    if len(join) > 1 and join[0] in "das" and join[1:].isdigit():
+        return join[0], int(join[1:])
+    return "z", 0
+
+
+def _build_overview(options: dict) -> str:
+    """Build a readable inventory of configured joins and bridge rules."""
+    entity_lines: list[tuple[str, str]] = []
+    expose_lines: list[tuple[str, str]] = []
+    action_lines: list[tuple[str, str]] = []
+    entity_count = sum(len(options.get(key, [])) for key in ALL_ENTITY_OPTION_KEYS)
+    expose_items = options.get(OPT_EXPOSES, [])
+    action_items = options.get(OPT_ACTIONS, [])
+
+    for key in ALL_ENTITY_OPTION_KEYS:
+        for item in options.get(key, []):
+            if not isinstance(item, dict):
+                continue
+            name = item.get(CONF_NAME, "Unnamed")
+            for field, value in item.items():
+                if not field.endswith("_join") or value in (None, ""):
+                    continue
+                join_type = (
+                    "s" if field == CONF_SERIAL_JOIN
+                    else "a" if field in _ANALOG_JOIN_FIELDS
+                    else "d"
+                )
+                join = str(value)
+                if not join.startswith(("d", "a", "s")):
+                    join = f"{join_type}{join}"
+                detail = field.removesuffix("_join").replace("_", " ")
+                line = f"- `{join}` — {_TYPE_LABELS[key]}: {name} ({detail})"
+                entity_lines.append((join, line))
+            # Climate presets are stored as a name -> digital join mapping.
+            for preset, number in (item.get(CONF_PRESETS) or {}).items():
+                join = str(number)
+                if not join.startswith(("d", "a", "s")):
+                    join = f"d{join}"
+                entity_lines.append(
+                    (join, f"- `{join}` — Climate: {name} (preset: {preset})")
+                )
+
+    for item in expose_items:
+        if not isinstance(item, dict):
+            continue
+        join = str(item.get(CONF_JOIN, "?"))
+        source = item.get(CONF_VALUE_TEMPLATE)
+        if source:
+            source_text = f"template: `{source}`"
+        else:
+            source_text = str(item.get(CONF_ENTITY_ID, "unknown entity"))
+            if item.get(CONF_ATTRIBUTE):
+                source_text += f" · attribute `{item[CONF_ATTRIBUTE]}`"
+        expose_lines.append(
+            (join, f"- `{join}` — {item.get(CONF_NAME, 'Unnamed')} ← {source_text}")
+        )
+
+    for item in action_items:
+        if not isinstance(item, dict):
+            continue
+        join = str(item.get(CONF_JOIN, "?"))
+        sequence = item.get(CONF_SCRIPT, [])
+        if isinstance(sequence, dict):
+            step_count = 1
+        else:
+            step_count = len(sequence) if isinstance(sequence, list) else 0
+        trigger = item.get(CONF_TRIGGER_ON, TRIGGER_ON_PRESS)
+        action_lines.append(
+            (
+                join,
+                f"- `{join}` — {item.get(CONF_NAME, 'Unnamed')} "
+                f"(trigger: {trigger}; {step_count} script step(s))",
+            )
+        )
+
+    def section(title: str, lines: list[tuple[str, str]]) -> str:
+        if not lines:
+            return f"### {title}\n_None configured._"
+        lines.sort(key=lambda row: (*_overview_join(row[0]), row[1].lower()))
+        return f"### {title}\n" + "\n".join(line for _, line in lines)
+
+    return "\n\n".join(
+        [
+            f"**Totals:** {entity_count} configured entity/entities · "
+            f"{len(expose_items)} expose(s) · {len(action_items)} action(s) · "
+            f"{len(options.get(OPT_DEVICES, []))} custom device(s)",
+            section("Entities and joins", entity_lines),
+            section("HA → Crestron (exposes)", expose_lines),
+            section("Crestron → HA (actions)", action_lines),
+        ]
+    )
+
 
 def _expose_fields(item: dict | None = None) -> dict:
     """Fields for the expose (HA -> Crestron) add/edit form.
@@ -1071,6 +1182,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_menu(
             step_id="init",
             menu_options=[
+                "overview",
                 "add_switch",
                 "add_light",
                 "add_cover",
@@ -1161,6 +1273,16 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
             ),
         }
 
+    async def async_step_overview(self, user_input=None):
+        """Show a read-only inventory of configured entities and joins."""
+        return self.async_show_form(
+            step_id="overview",
+            data_schema=vol.Schema({}),
+            description_placeholders={
+                "summary": _build_overview(self._entry.options)
+            },
+        )
+
     # ------------------------------------------------------------------
     # Add: Switch
     # ------------------------------------------------------------------
@@ -1240,7 +1362,7 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
                         {
                             vol.Required(
                                 "yaml_text", default=user_input.get("yaml_text", "")
-                            ): cv.string,
+                            ): selector({"text": {"multiline": True}}),
                             vol.Required(
                                 "overwrite", default=self._import_overwrite
                             ): cv.boolean,
@@ -1265,7 +1387,9 @@ class CrestronXsigOptionsFlow(config_entries.OptionsFlow):
             step_id="import_legacy",
             data_schema=vol.Schema(
                 {
-                    vol.Required("yaml_text"): cv.string,
+                    vol.Required("yaml_text"): selector(
+                        {"text": {"multiline": True}}
+                    ),
                     vol.Required("overwrite", default=False): cv.boolean,
                 }
             ),

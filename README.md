@@ -8,16 +8,33 @@ UI, and bridges between existing Home Assistant entities and Crestron.
 
 ## Installation and setup
 
-1. Install the repository contents directly into
-   `<config>/custom_components/crestron_xsig/`. For example, clone this
-   repository into that exact directory, or copy the repository-root files
-   there from the downloaded archive. `manifest.json` must be directly inside
-   `custom_components/crestron_xsig/`.
-2. Restart Home Assistant.
-3. Open **Settings → Devices & Services → Add Integration**, search for
+<!-- ha-marketplace:exclude-start -->
+### Home Assistant 2026.11 and newer: Marketplace
+
+[![Open Crestron XSIG in the Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=morettigiorgio&repository=ha-crestron-xsig&category=integration)
+
+Use the button above to open this repository in **Settings → Marketplace**.
+If it is not yet in the public catalog, Home Assistant will offer to add it as
+an integration repository. Install it there, then continue with **Add
+Integration** below.
+
+### Older Home Assistant versions
+
+Before Home Assistant 2026.11, install the repository through HACS (the
+predecessor to the built-in Marketplace) as a custom integration repository,
+or install it manually into `<config>/custom_components/crestron_xsig/`.
+For a manual install, clone or copy the repository-root files into that exact
+directory; `manifest.json` must be directly inside
+`custom_components/crestron_xsig/`. Restart Home Assistant after a manual
+install.
+<!-- ha-marketplace:exclude-end -->
+
+### Set up the integration
+
+1. Open **Settings → Devices & Services → Add Integration**, search for
    **Crestron XSIG**, and choose the TCP port Home Assistant will listen
    on.
-4. Configure the Crestron TCP/IP client to connect to Home Assistant's
+2. Configure the Crestron TCP/IP client to connect to Home Assistant's
    IP address and that port. Ensure the network and firewall allow the
    connection. Connect the client to an XSIG (Intersystem Communication)
    symbol and wire the signals to the appropriate joins.
@@ -33,14 +50,18 @@ processor device, custom child devices, or other Home Assistant devices.
 
 The Configure menu also supports:
 
+- **Overview of configured joins:** inspect a sorted inventory of configured entities, joins, exposes and actions. For a downloadable JSON snapshot, use **Download diagnostics** in the integration entry menu; review the file before sharing because it contains configured templates and scripts.
 - **Expose (Home Assistant → Crestron):** send an existing entity's
   state or a template result to a typed XSIG join (`dN`, `aN` or `sN`).
 - **Action (Crestron → Home Assistant):** run a Home Assistant action
   sequence when a configured join is received; the action can use
   `{{ value }}`.
-- **Import legacy YAML (in development):** maps `to_joins` and
-  `from_joins` from an older `crestron.yaml` to exposes and actions. The
-  import test has not yet been run; treat this path as unverified.
+- **Import legacy YAML:** imports `to_joins` and `from_joins` from an older
+  `crestron.yaml` as exposes and actions. The import flow has been tested
+  successfully. Paste the complete file contents into the multiline field,
+  preserving line breaks and indentation (open the file in a text editor and
+  copy it); direct file upload is not supported. Crestron synchronization
+  should still be verified separately on your system.
 
 Changes made in the Configure menu reload the integration automatically.
 The listener port can be changed through the integration's reconfigure

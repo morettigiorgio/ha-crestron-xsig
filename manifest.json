@@ -1,13 +1,15 @@
 {
   "domain": "crestron_xsig",
   "name": "Crestron XSIG",
+  "categories": ["hubs_protocols.building_automation"],
   "codeowners": ["@morettigiorgio"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/morettigiorgio/ha-crestron-xsig/blob/main/docs/help/README.md",
   "import_executor": true,
+  "integration_type": "hub",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/morettigiorgio/ha-crestron-xsig/issues",
   "requirements": [],
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
