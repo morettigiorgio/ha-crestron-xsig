@@ -3,6 +3,22 @@ __pycache__/
 .storage/
 .venv/
 venv/
+ha_config/
+/docker-compose.yml
+
+# Local credentials and private configuration.
+.env
+.env.*
+!.env.example
+secrets.yaml
+**/secrets.yaml
+*.secret
+*.secret.*
+*.pem
+*.key
+*.p12
+*.pfx
+
 AGENTS.md
 
 # Local-only maintainer material; keep it out of release snapshots.
