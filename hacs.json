@@ -1,4 +1,4 @@
 {
   "name": "Crestron XSIG",
-  "content_in_root": true
+  "homeassistant": "2026.10.0"
 }

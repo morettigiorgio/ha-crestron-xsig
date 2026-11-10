@@ -6,28 +6,26 @@ processor connects as a client. The integration supports digital,
 analog and serial joins, entity configuration from the Home Assistant
 UI, and bridges between existing Home Assistant entities and Crestron.
 
+Minimum supported Home Assistant Core version: **2026.10.0**.
+
 ## Installation and setup
 
-<!-- ha-marketplace:exclude-start -->
 ### Home Assistant 2026.11 and newer: Marketplace
 
 [![Open Crestron XSIG in the Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=morettigiorgio&repository=ha-crestron-xsig&category=integration)
 
-Use the button above to open this repository in **Settings → Marketplace**.
-If it is not yet in the public catalog, Home Assistant will offer to add it as
-an integration repository. Install it there, then continue with **Add
-Integration** below.
+Open **Settings → Marketplace** and add this GitHub repository if it is not
+yet available in the catalog. Install **Crestron XSIG**, then continue with
+**Add Integration** below. The Marketplace installation link has not yet been
+smoke-tested on a clean Home Assistant instance.
 
 ### Older Home Assistant versions
 
-Before Home Assistant 2026.11, install the repository through HACS (the
-predecessor to the built-in Marketplace) as a custom integration repository,
-or install it manually into `<config>/custom_components/crestron_xsig/`.
-For a manual install, clone or copy the repository-root files into that exact
-directory; `manifest.json` must be directly inside
-`custom_components/crestron_xsig/`. Restart Home Assistant after a manual
-install.
-<!-- ha-marketplace:exclude-end -->
+Before Home Assistant 2026.11, install the repository through HACS as a custom
+repository with category **Integration**. Alternatively, for a manual install,
+copy `custom_components/crestron_xsig/` from this repository into
+`<config>/custom_components/crestron_xsig/`; `manifest.json` must be directly
+inside that directory. Restart Home Assistant after a manual install.
 
 ### Set up the integration
 

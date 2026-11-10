@@ -22,9 +22,10 @@ posting them.
 
 ## Development setup
 
-The integration has no Python runtime requirements outside Home Assistant.
-For local development, use Python 3.12 or newer and install the development
-tools:
+The Home Assistant integration package is in
+`custom_components/crestron_xsig/`. It has no Python runtime requirements
+outside Home Assistant. For local development, use Python 3.12 or newer and
+install the development tools:
 
 ```bash
 python -m pip install -r requirements-dev.txt

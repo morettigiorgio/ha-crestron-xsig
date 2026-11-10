@@ -4,6 +4,8 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 1"
 
 permissions:
   contents: read
@@ -34,12 +36,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
-      - name: Prepare custom integration layout
-        run: |
-          mkdir -p custom_components/crestron_xsig
-          cp ./*.py manifest.json strings.json services.yaml custom_components/crestron_xsig/
-          cp -a brand translations custom_components/crestron_xsig/
-          rm manifest.json
       - name: Run hassfest
         uses: home-assistant/actions/hassfest@master
 

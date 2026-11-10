@@ -21,18 +21,23 @@ separate evidence. Passing a local check does not prove end-to-end behavior.
   workflow's first run on GitHub. Marketplace installation/update itself has
   not yet been smoke-tested. The local checks do not validate behavior in a
   running Home Assistant.
-- **Hardware:** The reported environment is Home Assistant
-  Container (Core 2026.10.4, Frontend 20260930.5) with a Crestron DIN-AP3
-  running firmware 1.8001.5761.28479. The test date and per-case matrix were
-  not supplied.
-- **Legacy YAML import:** the maintainer manually tested the import through
-  the Home Assistant UI and confirmed that it completed successfully. The
-  import form uses a multiline text field; paste the complete `crestron.yaml`
+- **Hardware:** Home Assistant Container (Core 2026.10.4, Frontend 20260930.5)
+  with a Crestron DIN-AP3 running firmware 1.8001.5761.28479. On 2026-11-10,
+  the maintainer reported successful tests of digital, analog and serial joins,
+  TCP connection/disconnection, and additional single-byte cases (the exact
+  bytes/commands were not specified). This is a maintainer-reported result;
+  it has not been independently observed. Record protocol cases more precisely
+  if further testing is done.
+- **Legacy YAML import:** the maintainer reports that it worked in an earlier
+  test, but it was not retested during the 2026-11-10 hardware session. The
+  earlier report does not specify whether it covered only importing the file
+  or also live synchronization of the imported rules with the Crestron
+  processor; that synchronization therefore remains unverified. The import
+  form uses a multiline text field; paste the complete `crestron.yaml`
   contents with their original line breaks and indentation (open the file in a
   text editor and copy it; direct file upload is not supported). The automated
   flow check verifies form serialization, but does not independently test YAML
-  parsing or imported-rule correctness. Live synchronization of the imported
-  rules with a Crestron processor has not yet been reported.
+  parsing or imported-rule correctness.
 
 ## Before a release
 

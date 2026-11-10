@@ -25,7 +25,11 @@ from pathlib import Path
 
 import probatio
 
-COMPONENT_DIR = Path(__file__).resolve().parent.parent
+COMPONENT_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "custom_components"
+    / "crestron_xsig"
+)
 
 
 # --------------------------------------------------------------------------

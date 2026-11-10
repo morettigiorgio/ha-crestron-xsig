@@ -5,7 +5,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and semantic versioning. Versions below `1.0.0` may include breaking changes;
 these will be called out explicitly.
 
-## [0.5.0] — Unreleased
+## [0.5.0-beta.1] — 2026-11-10
 
 ### Added
 
@@ -15,6 +15,13 @@ these will be called out explicitly.
   Marketplace.
 - Downloadable JSON diagnostics for a sorted inventory of configured
   entities, joins, exposes and actions.
+
+### Changed
+
+- Place the integration in Home Assistant's standard
+  `custom_components/crestron_xsig/` directory, remove the HACS
+  `content_in_root` workaround, and declare Home Assistant 2026.10.0 as the
+  minimum supported version in `hacs.json`.
 
 ### Fixed
 
